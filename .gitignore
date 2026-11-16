@@ -1,0 +1,6 @@
+/.data/*
+!/.data/.keep
+/odds_*.lua
+/workshop_*.lua
+/aac-sound-events.lua
+*.regrade-stage
