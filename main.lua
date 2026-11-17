@@ -5,7 +5,7 @@ local addon = {
     name = "Mazrim Regrade Effects",
     author = "Mazrim",
     desc = "Regrade cinematics and Odds Planner",
-    version = "0.5.13",
+    version = "0.5.20",
 }
 
 local PREFIX = "mazrim_regrade_settings_"

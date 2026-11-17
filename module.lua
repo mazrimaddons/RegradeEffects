@@ -38,6 +38,7 @@ for _, choice in ipairs(Cinema.choices) do
     end
 end
 local PREVIEW_ITEM_TYPE = 29692
+local PREVIEW_BOW_TYPE = 34615
 
 local function testOutcomes(scene)
     return scene == "voyage" and voyageTests or standardTests
@@ -113,7 +114,16 @@ local function itemDetails(api, itemType)
     return readName(info), readIcon(info)
 end
 
-local function previewItem(api)
+local function previewItem(api, scene, code)
+    if scene == "workbench" and code == 4 then
+        local name, icon = itemDetails(api, PREVIEW_BOW_TYPE)
+        return {
+            itemType = PREVIEW_BOW_TYPE,
+            itemName = name or "Obsidian Bow",
+            icon = icon or "game/ui/icon/icon_item_bow_0089.dds",
+            grade = 7, -- Celestial plus two grades makes the preview Epic.
+        }
+    end
     local name, icon = itemDetails(api, PREVIEW_ITEM_TYPE)
     return {
         itemType = PREVIEW_ITEM_TYPE,
@@ -292,7 +302,7 @@ function Regrade.definition(api)
                 if selected then
                     captureMaterials(api,scene,selected,readScroll(api,selected.tab))
                 else
-                    selected=previewItem(api)
+                    selected=previewItem(api,scene,code)
                     if selected then selected.window,selected.tab=window,tab end
                 end
                 local outcome=outcomes[code]

@@ -14,7 +14,6 @@ local PINBALL_PLINKO = BASE.."pinball-plinko.dds"
 local SLOT_CABINET, SLOT_PARTS = BASE.."slot-cabinet.dds", BASE.."slot-parts.dds"
 local SLOT_BOMB, COURT_AGURU = BASE.."slots-bomb.dds", BASE.."court-aguru.dds"
 local SLOT_BLAST = BASE.."slots-blast.dds"
-local WORKBENCH = BASE.."workbench-forge.dds"
 local AGURU = BASE.."aguru-cameos-v2.dds"
 local VOYAGE = BASE.."forge-voyage.dds"
 local VOYAGE_MAP = BASE.."forge-voyage-reefs.dds"
@@ -68,7 +67,7 @@ local NO_SHIP_GREAT = "Ship components have no Great Success outcome."
 local SPEED = {quick=.62,classic=1,cinematic=1.32}
 local SCENE_CUES={
     vault={.23,"vault"},mimic={.17,"mimic"},
-    workbench={.41,"workbench"},pinball={.832,"pinball"},trial={.61,"gavel"},
+    workbench={.22,"workbench"},pinball={.832,"pinball"},trial={.61,"gavel"},
 }
 local scenes = {}
 for _, file in ipairs({"scenes_vault","scenes_time","scenes_arcade","scenes_slots","scenes_voyage"}) do
@@ -234,7 +233,7 @@ function Cinema.new(api, fault)
         local arcade=arcadeArt[key]
         if arcade then return arcade[5] or ARCADE,arcade[1],arcade[2],arcade[3],arcade[4] end
         local bench=scenes.workbench and scenes.workbench.art and scenes.workbench.art[key]
-        if bench then return bench[5] and BASE..bench[5] or WORKBENCH,bench[1],bench[2],bench[3],bench[4] end
+        if bench then return BASE..bench[5],bench[1],bench[2],bench[3],bench[4] end
         local cameo=Aguru.art[key]
         if cameo then return AGURU,cameo[1],cameo[2],cameo[3],cameo[4] end
         local voyage=scenes.voyage and scenes.voyage.art and scenes.voyage.art[key]
@@ -599,6 +598,7 @@ function Cinema.new(api, fault)
         local now=clock(api)
         local hold=RESULT_HOLD
         if r.frame.code==0 then hold=math.max(hold,Aguru.hold(r.id,r.duration)) end
+        if r.scene.celebrationHold then hold=hold+(r.scene.celebrationHold[r.frame.celebrationVariant] or 0) end
         if r.preview then hold=hold+PREVIEW_EXTRA_MS end
         local expired=r.confirmed and now and now>=r.confirmed+r.duration+hold
         if not now or now<r.started or (expired and not r.liveVoyage)
@@ -690,13 +690,13 @@ function Cinema.new(api, fault)
             f.plinkoIndex=nextPlinkoRoute(result.code,f.seed)
         end
         if result.code==4 and id~="voyage" then
+            local count=r.scene.celebrationCount or 3
             if preview then
-                -- All three endings can be found without spending a scroll.
-                f.celebrationVariant=(previewVariants[id] or 0)%3+1
+                f.celebrationVariant=(previewVariants[id] or 0)%count+1
                 previewVariants[id]=f.celebrationVariant
             else
                 local roll=(math.floor(time)*73+f.seed*29)%100
-                f.celebrationVariant=roll<8 and 3 or roll<26 and 2 or 1
+                f.celebrationVariant=count==4 and roll>=94 and 4 or roll<8 and 3 or roll<26 and 2 or 1
             end
         end
         f.noItem=false

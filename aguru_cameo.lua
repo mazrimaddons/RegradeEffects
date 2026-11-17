@@ -13,7 +13,7 @@ local styles = {
     mimic = {row=1, when=.60, duration=3840, size=147, speech=105, speechX=35,
         accent={.85,.69,1}, line="No chewing my upgrades."},
     workbench = {row=2, when=.62, duration=4250, x=388, y=258, size=134, speech=78, floor=334, step=29,
-        accent={1,.70,.43}, line="Mine while it's hot."},
+        speechLead=100, accent={1,.70,.43}, line="Yoink, mine now !"},
     pinball = {row=3, when=1, duration=4300, x=611, y=206, size=137, item=44, speech=129, speechX=209,
         accent={.41,.96,.88}, line="Bonus ball. Mine."},
 }
@@ -110,7 +110,7 @@ local function dust(c, sceneId, x, y, age, accent)
 end
 
 local function speech(c,style,age)
-    local fade=smooth((age-GRAB)/100)*(1-smooth((age-EXIT+210)/190))
+    local fade=smooth((age-GRAB+(style.speechLead or 0))/100)*(1-smooth((age-EXIT+210)/190))
     if fade<=0 then return end
     local x=style.speechX or 365
     c.box(x,style.speech,281,31,INK,.92*fade)
